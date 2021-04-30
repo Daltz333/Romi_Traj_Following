@@ -44,13 +44,24 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     String trajectoryJson = "Barrel.wpilib.json";
-
+    /*
     try {
       Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJson);
       trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
     } catch (IOException e) {
       DriverStation.reportError("Unable to open trajectory", false);
-    }
+    }*/
+
+    trajectory = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        new Pose2d(0, 0, new Rotation2d(0)),
+        List.of(
+            new Translation2d(0.5, 0.25),
+            new Translation2d(1.0, -0.25),
+            new Translation2d(1.5, 0)
+        ),
+        new Pose2d(0.0, 0, new Rotation2d(Math.PI)),
+        new TrajectoryConfig(Constants.kMaxSpeed, Constants.kMaxAccel));
 
 
     drivetrain.plotTrajectory(trajectory);
@@ -81,12 +92,15 @@ public class Robot extends TimedRobot {
       var refChassisSpeeds = ramseteController.calculate(drivetrain.getOdometry().getPoseMeters(), desiredPose);
 
       var targetSpeeds = Drivetrain.kinematics.toWheelSpeeds(refChassisSpeedsTarget);
+      var targetSpeedsRamsete = Drivetrain.kinematics.toWheelSpeeds(refChassisSpeeds);
 
       SmartDashboard.putNumber("Left Current Speed", drivetrain.getWheelSpeeds().leftMetersPerSecond);
       SmartDashboard.putNumber("Left Target Speed", targetSpeeds.leftMetersPerSecond);
+      SmartDashboard.putNumber("Left Ramsete", targetSpeedsRamsete.leftMetersPerSecond);
 
       SmartDashboard.putNumber("Right Current Speed", drivetrain.getWheelSpeeds().rightMetersPerSecond);
       SmartDashboard.putNumber("Right Target Speed", targetSpeeds.rightMetersPerSecond);
+      SmartDashboard.putNumber("Right Ramsete", targetSpeedsRamsete.rightMetersPerSecond);
 
       drivetrain.drive(refChassisSpeeds.vxMetersPerSecond, refChassisSpeeds.omegaRadiansPerSecond);
     } else {

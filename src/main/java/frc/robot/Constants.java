@@ -18,14 +18,14 @@ public class Constants {
   public static final int kRightEncoderB = 7;
 
   // constants from characterization
-  public static final double kS = 0.929;
-  public static final double kV = 6.33;
-  public static final double kA = 0.0389;
-  public static final double kTrackWidth = 0.142072613;
+  public static final double kS = 0.38069;
+  public static final double kV = 9.9975;
+  public static final double kA = 0.60273;
+  public static final double kTrackWidth = 0.14;
 
-  public static final double kPLeft = 0.085;
-  public static final double kPRight = 0.085;
+  public static final double kPLeft = 0.08;
+  public static final double kPRight = 0.08;
 
-  public static final double kMaxSpeed = 0.8; // 1.6m/s
-  public static final double kMaxAccel = 0.6;
+  public static final double kMaxSpeed = 0.6;
+  public static final double kMaxAccel = 0.4;
 }

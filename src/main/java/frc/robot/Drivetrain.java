@@ -114,7 +114,7 @@ public class Drivetrain {
     var leftOutput = leftPid.calculate(leftEncoder.getRate(), speeds.leftMetersPerSecond);
     var rightOutput = rightPid.calculate(rightEncoder.getRate(), speeds.rightMetersPerSecond);
 
-    leftMotor.setVoltage(leftOutput + leftFeedforward);
+    leftMotor.setVoltage((leftOutput + leftFeedforward));
     rightMotor.setVoltage(-(rightOutput + rightFeedforward)); //negate right side
 
     diffyDrive.feed();
