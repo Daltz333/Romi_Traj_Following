@@ -77,7 +77,16 @@ public class Robot extends TimedRobot {
     if (timer.get() < trajectory.getTotalTimeSeconds()) {
       var desiredPose = trajectory.sample(timer.get());
 
+      var refChassisSpeedsTarget = new ChassisSpeeds(desiredPose.velocityMetersPerSecond, 0.0, desiredPose.velocityMetersPerSecond * desiredPose.curvatureRadPerMeter);
       var refChassisSpeeds = ramseteController.calculate(drivetrain.getOdometry().getPoseMeters(), desiredPose);
+
+      var targetSpeeds = Drivetrain.kinematics.toWheelSpeeds(refChassisSpeedsTarget);
+
+      SmartDashboard.putNumber("Left Current Speed", drivetrain.getWheelSpeeds().leftMetersPerSecond);
+      SmartDashboard.putNumber("Left Target Speed", targetSpeeds.leftMetersPerSecond);
+
+      SmartDashboard.putNumber("Right Current Speed", drivetrain.getWheelSpeeds().rightMetersPerSecond);
+      SmartDashboard.putNumber("Right Target Speed", targetSpeeds.rightMetersPerSecond);
 
       drivetrain.drive(refChassisSpeeds.vxMetersPerSecond, refChassisSpeeds.omegaRadiansPerSecond);
     } else {

@@ -42,7 +42,7 @@ public class Drivetrain {
   private final DifferentialDriveOdometry odometry =
       new DifferentialDriveOdometry(gyro.getRotation2d());
 
-  private final DifferentialDriveKinematics kinematics =
+  public static final DifferentialDriveKinematics kinematics =
       new DifferentialDriveKinematics(Constants.kTrackWidth);
 
   private final SimpleMotorFeedforward feedforward =
@@ -111,17 +111,11 @@ public class Drivetrain {
     var leftFeedforward = feedforward.calculate(speeds.leftMetersPerSecond);
     var rightFeedforward = feedforward.calculate(speeds.rightMetersPerSecond);
 
-    SmartDashboard.putNumber("LeftActual", getWheelSpeeds().leftMetersPerSecond);
-    SmartDashboard.putNumber("RightActual", getWheelSpeeds().rightMetersPerSecond);
-
-    SmartDashboard.putNumber("LeftTarget", speeds.leftMetersPerSecond);
-    SmartDashboard.putNumber("RightTarget", speeds.rightMetersPerSecond);
-
     var leftOutput = leftPid.calculate(leftEncoder.getRate(), speeds.leftMetersPerSecond);
     var rightOutput = rightPid.calculate(rightEncoder.getRate(), speeds.rightMetersPerSecond);
 
-    leftMotor.setVoltage(leftFeedforward);
-    rightMotor.setVoltage(-(rightFeedforward)); //negate right side
+    leftMotor.setVoltage(leftOutput + leftFeedforward);
+    rightMotor.setVoltage(-(rightOutput + rightFeedforward)); //negate right side
 
     diffyDrive.feed();
   }
