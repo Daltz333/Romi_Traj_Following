@@ -1,9 +1,9 @@
 {
   "lengthUnit": "Meter",
   "exportUnit": "Always Meters",
-  "maxVelocity": 0.3,
-  "maxAcceleration": 0.4,
+  "maxVelocity": 0.4,
+  "maxAcceleration": 0.3,
   "trackWidth": 0.142072613,
   "gameName": "Romi Barrel",
-  "outputDir": ""
+  "outputDir": ".."
 }

@@ -6,10 +6,12 @@ package frc.robot;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.RamseteController;
@@ -36,22 +38,26 @@ public class Robot extends TimedRobot {
   private final Drivetrain drivetrain = new Drivetrain();
 
   private Trajectory trajectory;
-
   private RamseteController ramseteController = new RamseteController();
 
   private Timer timer = new Timer();
 
+  private final ArrayList<Pose2d> prevPoses = new ArrayList<>();
+
+  int i = 0;
+
   @Override
   public void robotInit() {
     String trajectoryJson = "Barrel.wpilib.json";
-    /*
+    
     try {
       Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJson);
       trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
     } catch (IOException e) {
       DriverStation.reportError("Unable to open trajectory", false);
-    }*/
+    }
 
+    /* debug reference issue with trajectory generated
     trajectory = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
@@ -62,7 +68,7 @@ public class Robot extends TimedRobot {
         ),
         new Pose2d(0.0, 0, new Rotation2d(Math.PI)),
         new TrajectoryConfig(Constants.kMaxSpeed, Constants.kMaxAccel));
-
+    */
 
     drivetrain.plotTrajectory(trajectory);
   }
@@ -74,6 +80,11 @@ public class Robot extends TimedRobot {
         "Rotation", drivetrain.getOdometry().getPoseMeters().getRotation().getDegrees());
     SmartDashboard.putNumber("Pose Forward (X)", drivetrain.getOdometry().getPoseMeters().getX());
     SmartDashboard.putNumber("Pose Sideways (Y)", drivetrain.getOdometry().getPoseMeters().getY());
+
+    SmartDashboard.putNumber("Left Current Speed", drivetrain.getWheelSpeeds().leftMetersPerSecond);
+    SmartDashboard.putNumber("Right Current Speed", drivetrain.getWheelSpeeds().rightMetersPerSecond);
+
+    SmartDashboard.putNumber("Battery Voltage", RobotController.getBatteryVoltage());
   }
 
   @Override
@@ -88,17 +99,25 @@ public class Robot extends TimedRobot {
     if (timer.get() < trajectory.getTotalTimeSeconds()) {
       var desiredPose = trajectory.sample(timer.get());
 
+      if (i >= 20) {
+        i = 0;
+        prevPoses.add(desiredPose.poseMeters);
+      } else {
+        i++;
+      }
+
+      System.out.println(prevPoses.size());
+      Drivetrain.field.getObject("DesiredPose").setPoses(prevPoses);
+
       var refChassisSpeedsTarget = new ChassisSpeeds(desiredPose.velocityMetersPerSecond, 0.0, desiredPose.velocityMetersPerSecond * desiredPose.curvatureRadPerMeter);
       var refChassisSpeeds = ramseteController.calculate(drivetrain.getOdometry().getPoseMeters(), desiredPose);
 
       var targetSpeeds = Drivetrain.kinematics.toWheelSpeeds(refChassisSpeedsTarget);
       var targetSpeedsRamsete = Drivetrain.kinematics.toWheelSpeeds(refChassisSpeeds);
 
-      SmartDashboard.putNumber("Left Current Speed", drivetrain.getWheelSpeeds().leftMetersPerSecond);
       SmartDashboard.putNumber("Left Target Speed", targetSpeeds.leftMetersPerSecond);
       SmartDashboard.putNumber("Left Ramsete", targetSpeedsRamsete.leftMetersPerSecond);
 
-      SmartDashboard.putNumber("Right Current Speed", drivetrain.getWheelSpeeds().rightMetersPerSecond);
       SmartDashboard.putNumber("Right Target Speed", targetSpeeds.rightMetersPerSecond);
       SmartDashboard.putNumber("Right Ramsete", targetSpeedsRamsete.rightMetersPerSecond);
 
@@ -113,7 +132,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    drivetrain.drive();
+    drivetrain.driveOpenLoop(0.5, -0.5);
   }
 
   @Override

@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -51,7 +52,7 @@ public class Drivetrain {
   private final PIDController leftPid = new PIDController(Constants.kPLeft, 0, 0);
   private final PIDController rightPid = new PIDController(Constants.kPRight, 0, 0);
 
-  private final Field2d field = new Field2d();
+  public static final Field2d field = new Field2d();
 
   /** Creates a new RomiDrivetrain. */
   public Drivetrain() {
@@ -69,6 +70,11 @@ public class Drivetrain {
     var turn = controller.getX(Hand.kRight);
 
     diffyDrive.curvatureDrive(forward, turn, controller.getBumper(Hand.kRight));
+  }
+
+  public void driveOpenLoop(double leftmotor, double rightmotor) {
+    leftMotor.set(leftmotor);
+    rightMotor.set(rightmotor);
   }
 
   public void drive(double xSpeed, double rot) {

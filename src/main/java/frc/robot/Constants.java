@@ -19,12 +19,15 @@ public class Constants {
 
   // constants from characterization
   public static final double kS = 0.38069;
-  public static final double kV = 9.9975;
+  public static final double kV = 9.5975; //default of
   public static final double kA = 0.60273;
   public static final double kTrackWidth = 0.14;
 
-  public static final double kPLeft = 0.08;
-  public static final double kPRight = 0.08;
+  public static final double ramseteB = 2.1;
+  public static final double ramseteZeta = 0.8;
+
+  public static final double kPLeft = 13;
+  public static final double kPRight = 13;
 
   public static final double kMaxSpeed = 0.6;
   public static final double kMaxAccel = 0.4;
